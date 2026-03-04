@@ -112,4 +112,4 @@ while dsts:
                 "-map_metadata", "0:s:a:0", "-id3v2_version", "3", "-write_id3v1", "1",
                 str(dst_file)])
             converted += 1
-print(f'{len(copied)} processed, {converted} converted, {skipped} skipped')
+print(f'{len(copied)} processed, {converted} transcoded, {skipped} skipped')
