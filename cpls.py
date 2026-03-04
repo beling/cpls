@@ -57,8 +57,11 @@ except IOError as e:
     print(f"Error reading profile '{args.profile}': {e}")
     sys.exit(1)
 
-#supported_formats = {"mp3", "wma", "aac", "m4a", "mp4", "flac", "wav", "aif", "aiff", "alac"} # "wave", "mp4"
-#change_extension = {'opus': 'ogg'}  # all these are also supported
+# Check if the destination directory exists
+if not os.path.isdir(args.dst_dir):
+    print(f"Error: Destination directory '{args.dst_dir}' does not exist.")
+    print("Please make sure your USB drive is mounted or the path is correct.")
+    sys.exit(1)
 
 playlist_filename = Path(args.playlist_filename)
 dst_dir = Path(args.dst_dir)
