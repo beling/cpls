@@ -11,13 +11,46 @@ parser = argparse.ArgumentParser(prog='cp_playlist',
 parser.add_argument('playlist_filename', help='file name of m3u playlist')
 parser.add_argument('dst_dir', help='destination directory')
 parser.add_argument('-r', '--replace', action='store_true', help='whether to replace destination files if they already exist')
+parser.add_argument("-p", "--profile", default="default", help="Device profile name from the 'profiles/' directory (default: 'default')")
 args = parser.parse_args()
 
-supported_formats = {"mp3", "wma", "aac", "m4a", "mp4", "flac", "wav", "aif", "aiff", "alac"} # "wave", "mp4"
-change_extension = {'opus': 'ogg'}  # all these are also supported
-for (ext1, ext2) in change_extension.items():
-    supported_formats.insert(ext1)
-    supported_formats.insert(ext2)
+# --- Load Profile Logic ---
+supported_set = set()
+mapping_dict = {}
+    
+# Locate the profile file in 'profiles/' directory relative to the script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+profile_path = os.path.join(script_dir, 'profiles', args.profile)
+
+if not os.path.exists(profile_path):
+    print(f"Error: Profile '{args.profile}' not found at {profile_path}")
+    sys.exit(1)
+
+supported_formats = set()
+change_extension = {}
+
+# Load profile rules: first word is target, others map to it
+try:
+    with open(profile_path, 'r') as f:    # maybe encoding='latin-1'?
+        for line in f:
+            line = line.strip().lower()
+            if line.startswith('#'): continue
+
+            line = line.split()
+            if not line: continue
+            
+            target_ext = line[0]
+            supported_formats.add(target_ext)
+            
+            for source_ext in line[1:]:
+                change_extension[source_ext] = target_ext
+                supported_formats.add(source_ext)
+except IOError as e:
+    print(f"Error reading profile '{args.profile}': {e}")
+    sys.exit(1)
+
+#supported_formats = {"mp3", "wma", "aac", "m4a", "mp4", "flac", "wav", "aif", "aiff", "alac"} # "wave", "mp4"
+#change_extension = {'opus': 'ogg'}  # all these are also supported
 
 playlist_filename = Path(args.playlist_filename)
 dst_dir = Path(args.dst_dir)
