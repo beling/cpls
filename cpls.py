@@ -24,6 +24,14 @@ profile_path = os.path.join(script_dir, 'profiles', args.profile)
 
 if not os.path.exists(profile_path):
     print(f"Error: Profile '{args.profile}' not found at {profile_path}")
+    if args.profile == "default":
+        print("\nPlease create it by symlinking or copying an existing profile, e.g.:")
+        if os.name == 'nt':  # Windows
+            print(r"  copy profiles\wiim profiles\default")
+        else:                # Linux/macOS (ln is preferred)
+            print("  (cd profiles && ln -s wiim default)")
+            print("or")
+            print("  cp profiles/wiim profiles/default")
     sys.exit(1)
 
 supported_formats = set()
