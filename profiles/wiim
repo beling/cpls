@@ -6,7 +6,10 @@ aac mp4
 m4a m4b alac
 ape
 flac
-aiff aif aifc
+flc
+aiff
+aif
+aifc
 wav wave
 wma
 ogg opus
