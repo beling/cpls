@@ -1,0 +1,15 @@
+# Profile for WiiM Amp / Amp Pro / Amp Ultra
+# https://www.wiimhome.com/wiimamp/overview
+# https://www.blog.wiimhome.com/post/tech-tuesday-audio-codecs-demystified
+mp3
+aac mp4
+m4a m4b alac
+ape
+flac
+aiff aif aifc
+wav wave
+wma
+ogg opus
+# https://faq.wiimhome.com/en/support/solutions/articles/72000632263-playing-dsd-audio-files-on-wiim-devices
+dsf
+dff
