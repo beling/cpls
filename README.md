@@ -8,7 +8,7 @@ It intelligently handles path resolution, file format mapping, and automatic tra
 - **Playlist Support:** Tool for parsing `.m3u`, `.m3u8`, and simple `.txt` files (one file path per line).
 - **Metadata Awareness:** Automatically skips lines starting with `#` (e.g., `#EXTINF` metadata) and empty lines.
 - **Context-Aware Paths:** Full support for relative paths, resolved against the playlist file's location.
-- **Device Profiles:** Use profile files in the `devices/` directory to define hardware compatibility.
+- **Device Profiles:** Use profile files in the `profiles/` directory to define hardware compatibility.
 - **Extension Mapping:** Tool for renaming extensions based on profile rules (e.g., `ogg opus` maps `.opus` files to `.ogg`).
 - **Auto-Transcoding:** Automatically converts any unsupported formats to **MP3** via **ffmpeg**.
 
@@ -25,7 +25,7 @@ python cpls.py music.m3u /media/usb-drive/
 
 ## How Device Profiles Work
 
-Profiles are stored as text files in the `devices/` directory. The program parses them line by line:
+Profiles are stored as text files in the `profiles/` directory. The program parses them line by line:
 
 1. **Single extension per line:** The format is considered supported (e.g., `flac`).
 2. **Multiple extensions per line:** If a line contains multiple extensions (e.g., `ogg opus`), files using any of the subsequent extensions will be remapped to the **first** one in that line.
