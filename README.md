@@ -3,6 +3,16 @@
 `cpls` is a minimalist Python-based CLI tool for copying music files from playlists to USB drives or external devices.
 It intelligently handles path resolution, file format mapping, and automatic transcoding.
 
+## Example Usage
+```bash
+python cpls.py music.m3u /media/usb-drive/
+```
+
+To see all available options:
+```bash
+python cpls.py --help
+```
+
 ## Features
 
 - **Playlist Support:** Tool for parsing `.m3u`, `.m3u8`, and simple `.txt` files (one file path per line).
@@ -11,12 +21,6 @@ It intelligently handles path resolution, file format mapping, and automatic tra
 - **Device Profiles:** Use profile files in the `profiles/` directory to define hardware compatibility.
 - **Extension Mapping:** Tool for renaming extensions based on profile rules (e.g., `ogg opus` maps `.opus` files to `.ogg`).
 - **Auto-Transcoding:** Automatically converts any unsupported formats to **MP3** via **ffmpeg**.
-
-## Example Usage
-
-```bash
-python cpls.py music.m3u /media/usb-drive/
-```
 
 ## Requirements
 
