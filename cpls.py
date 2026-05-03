@@ -119,9 +119,8 @@ def delete_from_dst():
     for idx, fname in enumerate(to_del, start=1):
         f = dst_dir / fname
         print(f"[{idx}/{l}] {f}")
-        if real_run:
-            f.unlink(missing_ok=True)
-            to_del.clear()
+        if real_run: f.unlink(missing_ok=True)
+    to_del.clear()
 
 # Suggests deleting extra files from destination:
 if to_del:
@@ -138,12 +137,13 @@ skipped = 0
 converted = 0
 for idx, (dst_file, src_file) in enumerate(dst_to_src.items(), start=1):
     print(f"[{idx}/{total_files}] {src_file.name}",
-        f" -> {dst_file.name}" if src_file.name != dst_file.name else '', sep='')
+        f" -> {dst_file.name}" if src_file.name != dst_file.name else '', sep='', end='')
     dst_file = dst_dir / dst_file
     if not args.replace and dst_file.exists():
-        print("  destination file exists, skipped (run with -r flag to overwrite)")
+        print("  (exists, skipped; use -r flag to overwrite)")
         skipped += 1
         continue
+    else: print()
     if src_file.suffix[1:].lower() in supported_formats: # copy:
         if real_run: copyfile(src_file, dst_file)
     else:   # convert to mp3:
