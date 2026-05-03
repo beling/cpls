@@ -5,6 +5,8 @@ from pathlib import Path
 from collections import defaultdict
 import subprocess
 import argparse
+import os
+import sys
 
 parser = argparse.ArgumentParser(prog='cp_playlist',
                     description='Copy music files from playlist to given directory.')
@@ -92,10 +94,10 @@ while dsts:
     number = 1
     for src_file in src_files:
         dst_file = dst_file_candidate
-        while dst_file in dsts or dst_file in copied:
+        while dst_file in dsts or dst_file.name in copied:
             dst_file = dst_file.with_stem(dst_file_candidate.stem + str(number))
             number += 1
-        copied.add(dst_file)
+        copied.add(dst_file.name)
         print(f"[{len(copied)}/{total_files}] {src_file.name}",
             f" -> {dst_file.name}" if src_file.name != dst_file.name else '', sep='')
         dst_file = dst_dir / dst_file
@@ -113,3 +115,10 @@ while dsts:
                 str(dst_file)])
             converted += 1
 print(f'{len(copied)} processed, {converted} transcoded, {skipped} skipped')
+
+# Suggests deleting extra files from destination:
+to_del = [f.name for f in dst_dir.iterdir() if f.is_file() and f.name not in copied]
+if to_del:
+    print('The destination directory contains extra files:')
+    for to_del_file in to_del:
+        print(shlex.quote(to_del_file), end=' ')
