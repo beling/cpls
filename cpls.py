@@ -3,18 +3,21 @@
 from shutil import copyfile
 from pathlib import Path
 from collections import defaultdict
+from shlex import quote
 import subprocess
 import argparse
 import os
 import sys
 
-parser = argparse.ArgumentParser(prog='cp_playlist',
-                    description='Copy music files from playlist to given directory.')
+
+parser = argparse.ArgumentParser(prog='cp_playlist', description='Copy music files from playlist to given directory.')
 parser.add_argument('playlist_filename', help='file name of m3u playlist')
 parser.add_argument('dst_dir', help='destination directory')
 parser.add_argument('-r', '--replace', action='store_true', help='whether to replace destination files if they already exist')
 parser.add_argument("-p", "--profile", default="default", help="Device profile name from the 'profiles/' directory (default: 'default')")
+parser.add_argument('-d', '--dry', action='store_true', help='dry run, without copying or deleting files')
 args = parser.parse_args()
+real_run = not args.dry
 
 # --- Load Profile Logic ---
 supported_set = set()
@@ -106,9 +109,9 @@ while dsts:
             skipped += 1
             continue
         if src_file.suffix[1:].lower() in supported_formats: # copy:
-            copyfile(src_file, dst_file)
+            if real_run: copyfile(src_file, dst_file)
         else:   # convert to mp3:
-            subprocess.run(["ffmpeg",
+            if real_run: subprocess.run(["ffmpeg",
                 "-hide_banner", "-loglevel", "error",
                 "-i", str(src_file), "-codec:a", "libmp3lame", "-qscale:a", "2",
                 "-map_metadata", "0:s:a:0", "-id3v2_version", "3", "-write_id3v1", "1",
@@ -119,6 +122,6 @@ print(f'{len(copied)} processed, {converted} transcoded, {skipped} skipped')
 # Suggests deleting extra files from destination:
 to_del = [f.name for f in dst_dir.iterdir() if f.is_file() and f.name not in copied]
 if to_del:
-    print('The destination directory contains extra files:')
+    print(f'The destination directory contains {len(to_del)} extra files:')
     for to_del_file in to_del:
-        print(shlex.quote(to_del_file), end=' ')
+        print(quote(to_del_file), end=' ')
