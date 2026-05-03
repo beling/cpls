@@ -14,8 +14,12 @@ parser = argparse.ArgumentParser(prog='cp_playlist', description='Copy music fil
 parser.add_argument('playlist_filename', help='file name of m3u playlist')
 parser.add_argument('dst_dir', help='destination directory')
 parser.add_argument('-r', '--replace', action='store_true', help='whether to replace destination files if they already exist')
-parser.add_argument("-p", "--profile", default="default", help="Device profile name from the 'profiles/' directory (default: 'default')")
+parser.add_argument('-p', '--profile', default='default', help="Device profile name from the 'profiles/' directory (default: 'default')")
 parser.add_argument('-d', '--dry', action='store_true', help='dry run, without copying or deleting files')
+del_args = parser.add_mutually_exclusive_group()
+del_args.add_argument('--del', dest='autodel', action='store_true', help='delete extra files in destination directory')
+del_args.add_argument('--nodel', action='store_true', help='do not scan for and delete extra files in destination directory')
+del_args.add_argument('--askdel', action='store_true', help='ask whether to delete the extra files in destination directory (default)')
 args = parser.parse_args()
 real_run = not args.dry
 
@@ -87,7 +91,7 @@ with open(playlist_filename) as f:
         src_file = playlist_filename.parent / Path(src_file.strip())
         dsts[dst_file(src_file)].append(src_file)
 
-to_del = set(f.name for f in dst_dir.iterdir() if f.is_file())
+to_del = set() if args.nodel else set(f.name for f in dst_dir.iterdir() if f.is_file())
 dst_to_src = {}
 skipped = 0
 converted = 0
@@ -101,6 +105,33 @@ while dsts:
             number += 1
         dst_to_src[dst_file] = src_file
         to_del.discard(dst_file.name)
+
+def print_to_del():
+    print(f'The destination directory contains {len(to_del)} extra files:')
+    for to_del_file in to_del:
+        print(quote(to_del_file), end=' ')
+    print()
+
+def delete_from_dst():
+    global to_del
+    l = len(to_del)
+    print(f"Deleting {l} extra files from destination directory:")
+    for idx, fname in enumerate(to_del, start=1):
+        f = dst_dir / fname
+        print(f"[{idx}/{l}] {f}")
+        if real_run:
+            f.unlink(missing_ok=True)
+            to_del.clear()
+
+# Suggests deleting extra files from destination:
+if to_del:
+    if args.autodel: delete_from_dst()
+    else:
+        print_to_del()
+        while True:
+            answer = input('Do you want to delete these files? [Y/N] ').lower()
+            if answer in ['y', 'yes', 'n', 'no']: break
+        if answer[0] == 'y': delete_from_dst()
 
 total_files = len(dst_to_src)
 skipped = 0
@@ -124,8 +155,4 @@ for idx, (dst_file, src_file) in enumerate(dst_to_src.items(), start=1):
         converted += 1
 print(f'{len(dst_to_src)} processed, {converted} transcoded, {skipped} skipped')
 
-# Suggests deleting extra files from destination:
-if to_del:
-    print(f'The destination directory contains {len(to_del)} extra files:')
-    for to_del_file in to_del:
-        print(quote(to_del_file), end=' ')
+if to_del: print_to_del()
