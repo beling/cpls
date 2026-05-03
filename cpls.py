@@ -9,15 +9,14 @@ import argparse
 import os
 import sys
 
-
-parser = argparse.ArgumentParser(prog='cp_playlist', description='Copy music files from playlist to given directory.')
+parser = argparse.ArgumentParser(prog='cpls', description='Copy music files from playlist to given directory.')
 parser.add_argument('playlist_filename', help='file name of m3u playlist')
 parser.add_argument('dst_dir', help='destination directory')
-parser.add_argument('-r', '--replace', action='store_true', help='whether to replace destination files if they already exist')
-parser.add_argument('-p', '--profile', default='default', help="Device profile name from the 'profiles/' directory (default: 'default')")
-parser.add_argument('-d', '--dry', action='store_true', help='dry run, without copying or deleting files')
+parser.add_argument('-r', '--replace', '--overwrite', action='store_true', help='whether to replace destination files if they already exist')
+parser.add_argument('-p', '--profile', '--dev', '--device', default='default', help="Device profile name from the 'profiles/' directory (default: 'default')")
+parser.add_argument('--dry', action='store_true', help='dry run, without copying or deleting files')
 del_args = parser.add_mutually_exclusive_group()
-del_args.add_argument('--del', dest='autodel', action='store_true', help='delete extra files in destination directory')
+del_args.add_argument('--del', '--delete', '--autodel', '--rm', dest='autodel', action='store_true', help='delete extra files in destination directory')
 del_args.add_argument('--nodel', action='store_true', help='do not scan for and delete extra files in destination directory')
 del_args.add_argument('--askdel', action='store_true', help='ask whether to delete the extra files in destination directory (default)')
 args = parser.parse_args()
@@ -28,11 +27,11 @@ supported_set = set()
 mapping_dict = {}
     
 # Locate the profile file in 'profiles/' directory relative to the script
-script_dir = os.path.dirname(os.path.abspath(__file__))
-profile_path = os.path.join(script_dir, 'profiles', args.profile)
+profiles_path = Path(__file__).resolve().parent / 'profiles'
+profile_file = profiles_path / args.profile
 
-if not os.path.exists(profile_path):
-    print(f"Error: Profile '{args.profile}' not found at {profile_path}")
+if not profile_file.exists():
+    print(f"Error: Profile file '{args.profile}' not found in {profiles_path}")
     if args.profile == "default":
         print("\nPlease create it by symlinking or copying an existing profile, e.g.:")
         if os.name == 'nt':  # Windows
@@ -41,6 +40,7 @@ if not os.path.exists(profile_path):
             print("  (cd profiles && ln -s wiim default)")
             print("or")
             print("  cp profiles/wiim profiles/default")
+    print('Available profiles:', ', '.join(f.name for f in profiles_path.iterdir() if f.is_file()))
     sys.exit(1)
 
 supported_formats = set()
@@ -48,7 +48,7 @@ change_extension = {}
 
 # Load profile rules: first word is target, others map to it
 try:
-    with open(profile_path, 'r') as f:    # maybe encoding='latin-1'?
+    with open(profile_file, 'r') as f:    # maybe encoding='latin-1'?
         for line in f:
             line = line.strip().lower()
             if line.startswith('#'): continue
@@ -67,7 +67,7 @@ except IOError as e:
     sys.exit(1)
 
 # Check if the destination directory exists
-if not os.path.isdir(args.dst_dir):
+if not Path(args.dst_dir).exists():
     print(f"Error: Destination directory '{args.dst_dir}' does not exist.")
     print("Please make sure your USB drive is mounted or the path is correct.")
     sys.exit(1)
