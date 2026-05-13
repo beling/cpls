@@ -1,6 +1,6 @@
 # cpls (Copy PlayList)
 
-`cpls` is a minimalist Python-based CLI tool for copying music files from playlists to USB drives or external devices.
+`cpls` is a minimalist Python-based CLI tool for copying music files from playlists to the specified folder, usually a USB drive or an external device.
 It intelligently handles path resolution, file format mapping, and automatic transcoding.
 
 ## Example Usage
@@ -32,8 +32,9 @@ python cpls.py --help
 Profiles are stored as text files in the `profiles/` directory. The program parses them line by line:
 
 1. **Single extension per line:** The format is considered supported (e.g., `flac`).
-2. **Multiple extensions per line:** If a line contains multiple extensions (e.g., `ogg opus`), files using any of the subsequent extensions will be remapped to the **first** one in that line.
+2. **Multiple extensions per line:** If a line contains multiple extensions (e.g., `ogg opus`), files using any of the subsequent extensions are considered supported and will be renamed to the **first** one in that line.
 3. **Automatic Conversion:** Any file extension not listed in the active device profile is automatically transcoded to **MP3** using `ffmpeg`.
+4. **Comments:** Lines beginning with a `#` are ignored.
 
 ## License
 
