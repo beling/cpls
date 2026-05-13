@@ -34,7 +34,7 @@ Profiles are stored as text files in the `profiles/` directory. The program pars
 - **Single extension per line:** The format is considered supported (e.g., `flac`).
 - **Multiple extensions per line:** If a line contains multiple extensions (e.g., `ogg opus`), files using any of the subsequent extensions are considered supported and will be renamed to the **first** one in that line.
 - **Automatic Conversion:** Any file extension not listed in the active device profile is automatically transcoded to **MP3** using `ffmpeg`.
-- **Comments:** Lines beginning with a `#` are ignored.
+- **Comments:** Lines beginning with a `#` are ignored. We recommend starting the profile file with a comment listing the names of supported devices, followed by comments indicating the sources of information (usually links to device manuals or manufacturers' websites).
 
 ## License
 
