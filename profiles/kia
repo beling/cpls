@@ -1,0 +1,20 @@
+# Kia / Hyundai Gen5, Gen5W, ccNC infotainment
+# Based on official PREM_GEN5 and ccNC documentation.
+# PREM_GEN5: mp3, wma, mka, wav, flac, m4a, ape, tta, aiff
+# ccNC: mp3, wma, wav, ogg, flac, tta, amr, ape, dff, dsf, dts
+# http://webmanual.hyundai.com/ccNC/AVNT/EUR/English/Appendix_spec.html
+# http://webmanual.hyundai.com/PREM_GEN5/AVNT/FE/KOR/English/reference003.html
+mp3
+wma
+wav wave
+ogg opus # opus to check
+flac
+m4a	aac alac # to check
+mka # to check
+ape	# monkey's audio file
+tta
+aiff # to check
+amr
+dff
+dsf
+dts
