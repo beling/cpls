@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser(prog='cpls', description='Copy music files from
 parser.add_argument('playlist_filename', help='file name of m3u playlist')
 parser.add_argument('dst_dir', help='destination directory')
 parser.add_argument('-r', '--replace', '--overwrite', action='store_true', help='whether to replace destination files if they already exist')
-parser.add_argument('-p', '--profile', '--dev', '--device', nargs='?', default=None, const='default', help="If the flag is not set, the files are copied without transcoding. Otherwise, transcoding is performed according to the device profile, with the name specified or 'default'. Profile files are read from the 'profiles/' directory.")
+parser.add_argument('-p', '--profile', '--dev', '--device', nargs='?', default=None, const='default', help="If the flag is not given, the files are copied without transcoding. Otherwise, transcoding is performed according to the device profile, with the name specified or 'default'. Profile files are read from the 'profiles/' directory.")
 parser.add_argument('--dry', action='store_true', help='dry run, without copying or deleting files')
 parser.add_argument('-l', '--lists', '--play_lists', help='generate shuffled playlist files', nargs='?', const=1, default=0, type=int)
 del_args = parser.add_mutually_exclusive_group()
