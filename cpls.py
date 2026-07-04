@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser(prog='cpls', description='Copy music files from
 parser.add_argument('playlist_filename', help='file name of m3u playlist')
 parser.add_argument('dst_dir', help='destination directory')
 parser.add_argument('-r', '--replace', '--overwrite', action='store_true', help='whether to replace destination files if they already exist')
-parser.add_argument('-p', '--profile', '--dev', '--device', default='default', help="Device profile name from the 'profiles/' directory (default: 'default')")
+parser.add_argument('-p', '--profile', '--dev', '--device', nargs='?', default=None, const='default', help="If the flag is not set, the files are copied without transcoding. Otherwise, transcoding is performed according to the device profile, with the name specified or 'default'. Profile files are read from the 'profiles/' directory.")
 parser.add_argument('--dry', action='store_true', help='dry run, without copying or deleting files')
 parser.add_argument('-l', '--lists', '--play_lists', help='generate shuffled playlist files', nargs='?', const=1, default=0, type=int)
 del_args = parser.add_mutually_exclusive_group()
@@ -29,9 +29,9 @@ mapping_dict = {}
     
 # Locate the profile file in 'profiles/' directory relative to the script
 profiles_path = Path(__file__).resolve().parent / 'profiles'
-profile_file = profiles_path / args.profile
+profile_file = profiles_path / args.profile if args.profile else None
 
-if not profile_file.exists():
+if profile_file and not profile_file.exists():
     print(f"Error: Profile file '{args.profile}' not found in {profiles_path}")
     if args.profile == "default":
         print("\nPlease create it by symlinking or copying an existing profile, e.g.:")
@@ -44,28 +44,28 @@ if not profile_file.exists():
     print('Available profiles:', ', '.join(f.name for f in profiles_path.iterdir() if f.is_file()))
     sys.exit(1)
 
-supported_formats = set()
-change_extension = {}
-
 # Load profile rules: first word is target, others map to it
-try:
-    with open(profile_file, 'r') as f:    # maybe encoding='latin-1'?
-        for line in f:
-            line = line.strip().lower()
-            if line.startswith('#'): continue
+if profile_file:
+    supported_formats = set()
+    change_extension = {}
+    try:
+        with open(profile_file, 'r') as f:    # maybe encoding='latin-1'?
+            for line in f:
+                line = line.strip().lower()
+                if line.startswith('#'): continue
 
-            line = line.split()
-            if not line: continue
-            
-            target_ext = line[0]
-            supported_formats.add(target_ext)
-            
-            for source_ext in line[1:]:
-                change_extension[source_ext] = target_ext
-                supported_formats.add(source_ext)
-except IOError as e:
-    print(f"Error reading profile '{args.profile}': {e}")
-    sys.exit(1)
+                line = line.split()
+                if not line: continue
+                
+                target_ext = line[0]
+                supported_formats.add(target_ext)
+                
+                for source_ext in line[1:]:
+                    change_extension[source_ext] = target_ext
+                    supported_formats.add(source_ext)
+    except IOError as e:
+        print(f"Error reading profile '{args.profile}': {e}")
+        sys.exit(1)
 
 # Check if the destination directory exists
 if not Path(args.dst_dir).exists():
@@ -77,12 +77,13 @@ playlist_filename = Path(args.playlist_filename)
 dst_dir = Path(args.dst_dir)
 
 def dst_file(src_file: Path) -> Path:
-    src_file = src_file.with_suffix(src_file.suffix.lower())
-    src_ext = src_file.suffix[1:]
-    if src_ext in supported_formats:
-        src_file = src_file.with_suffix('.' + change_extension.get(src_ext, src_ext))
-    else:
-        src_file = src_file.with_suffix('.mp3')
+    if profile_file:
+        src_file = src_file.with_suffix(src_file.suffix.lower())
+        src_ext = src_file.suffix[1:]
+        if src_ext in supported_formats:
+            src_file = src_file.with_suffix('.' + change_extension.get(src_ext, src_ext))
+        else:
+            src_file = src_file.with_suffix('.mp3')
     return Path(src_file.name)
 
 metadata = None
@@ -149,7 +150,7 @@ for idx, (dst_file, (src_file, metadata)) in enumerate(dst_to_src.items(), start
         skipped += 1
         continue
     else: print()
-    if src_file.suffix[1:].lower() in supported_formats: # copy:
+    if not profile_file or src_file.suffix[1:].lower() in supported_formats: # copy:
         if real_run: copyfile(src_file, dst_file)
     else:   # convert to mp3:
         if real_run: subprocess.run(["ffmpeg",
