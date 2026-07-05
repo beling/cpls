@@ -31,6 +31,7 @@ mapping_dict = {}
 profiles_path = Path(__file__).resolve().parent / 'profiles'
 profile_file = profiles_path / args.profile if args.profile else None
 
+# Checking if the profile file (if given) exists
 if profile_file and not profile_file.exists():
     print(f"Error: Profile file '{args.profile}' not found in {profiles_path}")
     if args.profile == "default":
@@ -76,7 +77,7 @@ if not Path(args.dst_dir).exists():
 playlist_filename = Path(args.playlist_filename)
 dst_dir = Path(args.dst_dir)
 
-def dst_file(src_file: Path) -> Path:
+def dst_file(src_file: Path) -> Path:   # destination file name (without path)
     if profile_file:
         src_file = src_file.with_suffix(src_file.suffix.lower())
         src_ext = src_file.suffix[1:]
@@ -111,6 +112,10 @@ while dsts:
             number += 1
         dst_to_src[dst_file] = src_file
         to_del.discard(dst_file.name)
+if args.lists > 0:
+    to_del.discard('all.m3u')
+    for i in range(1, args.lists): to_del.discard(f'all{i}.m3u')
+
 
 def print_to_del():
     print(f'The destination directory contains {len(to_del)} extra files:')
@@ -141,7 +146,7 @@ if to_del:
 total_files = len(dst_to_src)
 skipped = 0
 converted = 0
-for idx, (dst_file, (src_file, metadata)) in enumerate(dst_to_src.items(), start=1):
+for idx, (dst_file, (src_file, metadata)) in enumerate(reversed(dst_to_src.items()), start=1):
     print(f"[{idx}/{total_files}] {src_file.name}",
         f" -> {dst_file.name}" if src_file.name != dst_file.name else '', sep='', end='')
     dst_file = dst_dir / dst_file
@@ -160,21 +165,22 @@ for idx, (dst_file, (src_file, metadata)) in enumerate(dst_to_src.items(), start
             str(dst_file)])
         converted += 1
 
-if parser.lists > 0:
-    print('save playlists:', end='')
-    entries = [f'{metadata}\n{dst_file}' if metadata else str(dst_file) for dst_file, (_, metadata) in dst_to_src.items()]
+if args.lists > 0:
+    print('Save playlists:', end='', flush=True)
+    entries = [f'{metadata}{dst_file}\n' if metadata else str(dst_file) for dst_file, (_, metadata) in reversed(dst_to_src.items())]
 
     def save_list(list_file_name):
-        print(' ', end='')
-        print(list_file_name, end='')
+        print('', list_file_name, end='', flush=True)
         with open(dst_dir / list_file_name, 'w') as f:
+            f.write('#EXTM3U\n')
             for e in entries: f.write(e)
 
     save_list('all.m3u')
     from random import shuffle
-    for i in range(1, parser.lists):
+    for i in range(1, args.lists):
         shuffle(entries)
         save_list(f'all{i}.m3u')
+    print()
 
 print(f'{len(dst_to_src)} processed, {converted} transcoded, {skipped} skipped')
 
