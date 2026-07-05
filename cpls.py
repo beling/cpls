@@ -172,9 +172,10 @@ if args.lists > 0:
 
     def save_list(list_file_name):
         print('', list_file_name, end='', flush=True)
-        with open(dst_dir / list_file_name, 'w') as f:
-            f.write('#EXTM3U\n')
-            for e in entries: f.write(e)
+        if real_run:
+            with open(dst_dir / list_file_name, 'w') as f:
+                f.write('#EXTM3U\n')
+                for e in entries: f.write(e)
 
     save_list('0.m3u')
     from random import shuffle
