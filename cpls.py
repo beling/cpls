@@ -15,7 +15,7 @@ parser.add_argument('dst_dir', help='destination directory')
 parser.add_argument('-r', '--replace', '--overwrite', action='store_true', help='whether to replace destination files if they already exist')
 parser.add_argument('-p', '--profile', '--dev', '--device', nargs='?', default=None, const='default', help="If the flag is not given, the files are copied without transcoding. Otherwise, transcoding is performed according to the device profile, with the name specified or 'default'. Profile files are read from the 'profiles/' directory.")
 parser.add_argument('--dry', action='store_true', help='dry run, without copying or deleting files')
-parser.add_argument('-l', '--lists', '--play_lists', help='generate shuffled playlist files', nargs='?', const=1, default=0, type=int)
+parser.add_argument('-l', '--lists', '--play_lists', help='Save playlist(s) in destination. If one list is not enough, the number of lists can be given. Extra lists are shuffled.', nargs='?', const=1, default=0, type=int)
 del_args = parser.add_mutually_exclusive_group()
 del_args.add_argument('--del', '--delete', '--autodel', '--rm', dest='autodel', action='store_true', help='delete extra files in destination directory')
 del_args.add_argument('--nodel', action='store_true', help='do not scan for and delete extra files in destination directory')
@@ -113,8 +113,7 @@ while dsts:
         dst_to_src[dst_file] = src_file
         to_del.discard(dst_file.name)
 if args.lists > 0:
-    to_del.discard('all.m3u')
-    for i in range(1, args.lists): to_del.discard(f'all{i}.m3u')
+    for i in range(args.lists): to_del.discard(f'{i}.m3u')
 
 
 def print_to_del():
@@ -165,6 +164,8 @@ for idx, (dst_file, (src_file, metadata)) in enumerate(reversed(dst_to_src.items
             str(dst_file)])
         converted += 1
 
+print(f'{len(dst_to_src)} processed, {converted} transcoded, {skipped} skipped')
+
 if args.lists > 0:
     print('Save playlists:', end='', flush=True)
     entries = [f'{metadata}{dst_file}\n' if metadata else str(dst_file) for dst_file, (_, metadata) in reversed(dst_to_src.items())]
@@ -175,13 +176,11 @@ if args.lists > 0:
             f.write('#EXTM3U\n')
             for e in entries: f.write(e)
 
-    save_list('all.m3u')
+    save_list('0.m3u')
     from random import shuffle
     for i in range(1, args.lists):
         shuffle(entries)
-        save_list(f'all{i}.m3u')
+        save_list(f'{i}.m3u')
     print()
-
-print(f'{len(dst_to_src)} processed, {converted} transcoded, {skipped} skipped')
 
 if to_del: print_to_del()
