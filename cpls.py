@@ -168,14 +168,14 @@ print(f'{len(dst_to_src)} processed, {converted} transcoded, {skipped} skipped')
 
 if args.lists > 0:
     print('Save playlists:', end='', flush=True)
-    entries = [f'{metadata}{dst_file}\n' if metadata else str(dst_file) for dst_file, (_, metadata) in reversed(dst_to_src.items())]
+    entries = [metadata + str(dst_file) if metadata else str(dst_file) for dst_file, (_, metadata) in reversed(dst_to_src.items())]
 
     def save_list(list_file_name):
         print('', list_file_name, end='', flush=True)
         if real_run:
             with open(dst_dir / list_file_name, 'w') as f:
                 f.write('#EXTM3U\n')
-                for e in entries: f.write(e)
+                f.write('\n'.join(entries))
 
     save_list('0.m3u')
     from random import shuffle
