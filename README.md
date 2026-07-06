@@ -13,6 +13,17 @@ To see all available options:
 python cpls.py --help
 ```
 
+In Unix-like/Linux system, after granting execute permission by:
+```bash
+chmod +x cpls.py
+```
+the script can be run simply by:
+```bash
+./cpls.py music.m3u /media/usb-drive/
+./cpls.py --help
+```
+
+
 ## Features
 
 - **Playlist Support:** Tool for parsing `.m3u`, `.m3u8`, and simple `.txt` files (one file path per line).
@@ -21,6 +32,7 @@ python cpls.py --help
 - **Device Profiles:** Use profile files in the `profiles/` directory to define hardware compatibility.
 - **Extension Mapping:** Tool for renaming extensions based on profile rules (e.g., `ogg opus` maps `.opus` files to `.ogg`).
 - **Auto-Transcoding:** Automatically converts any unsupported formats to **MP3** via **ffmpeg**.
+- **Creating a playlist:** Upon request, a playlist with the copied files is created in the destination folder.
 
 ## Requirements
 
