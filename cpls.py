@@ -173,7 +173,7 @@ for idx, (dst_file, (src_file, metadata)) in enumerate(reversed(dst_to_src.items
             str(dst_file)])
         converted += 1
 
-print(f'{len(dst_to_src)} processed, {converted} transcoded, {skipped} skipped')
+print(f'{len(dst_to_src)-converted-skipped} copied, {converted} transcoded, {skipped} skipped')
 
 if args.lists > 0:
     print('Save playlists:', end='', flush=True)
