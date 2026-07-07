@@ -149,12 +149,21 @@ for idx, (dst_file, (src_file, metadata)) in enumerate(reversed(dst_to_src.items
     print(f"[{idx}/{total_files}] {src_file.name}",
         f" -> {dst_file.name}" if src_file.name != dst_file.name else '', sep='', end='')
     dst_file = dst_dir / dst_file
-    if not args.replace and dst_file.exists():
+    to_copy = not profile_file or src_file.suffix[1:].lower() in supported_formats # file to be simply copied?
+    
+    def should_copy():
+        try: dst_stat = dst_file.stat()
+        except FileNotFoundError: return True   # destination does not exist
+        src_stat = src_file.stat()
+        if src_stat.st_mtime_ns > dst_stat.st_mtime_ns: return True # modification after last coping
+        return to_copy and src_stat.st_size != dst_stat.st_size # file to copy differs in size
+
+    if not args.replace and not should_copy():
         print("  (exists, skipped; use -r flag to overwrite)")
         skipped += 1
         continue
     else: print()
-    if not profile_file or src_file.suffix[1:].lower() in supported_formats: # copy:
+    if to_copy: # copy:
         if real_run: copyfile(src_file, dst_file)
     else:   # convert to mp3:
         if real_run: subprocess.run(["ffmpeg",
