@@ -32,7 +32,7 @@ the script can be run simply by:
 - **Device Profiles:** Use profile files in the `profiles/` directory to define hardware compatibility.
 - **Extension Mapping:** Tool for renaming extensions based on profile rules (e.g., `ogg opus` maps `.opus` files to `.ogg`).
 - **Auto-Transcoding:** Automatically converts any unsupported formats to **MP3** via **ffmpeg**.
-- **Smart updates:** Unchanged files are not copied again. Files not on the list are, on request, deleted from the destination.
+- **Smart updates:** Unchanged files are not copied again. Files not on the list are, on request, deleted from the destination folder.
 - **Creating a playlist:** Upon request, a playlist with the copied files is created in the destination folder.
 
 ## Requirements
