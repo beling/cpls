@@ -159,7 +159,7 @@ for idx, (dst_file, (src_file, metadata)) in enumerate(reversed(dst_to_src.items
         return to_copy and src_stat.st_size != dst_stat.st_size # file to copy differs in size
 
     if not args.replace and not should_copy():
-        print("  (exists, skipped; use -r flag to overwrite)")
+        print("  (skipped as existing)")
         skipped += 1
         continue
     else: print()
@@ -173,7 +173,7 @@ for idx, (dst_file, (src_file, metadata)) in enumerate(reversed(dst_to_src.items
             str(dst_file)])
         converted += 1
 
-print(f'{len(dst_to_src)-converted-skipped} copied, {converted} transcoded, {skipped} skipped')
+print(f'{len(dst_to_src)-converted-skipped} copied, {converted} transcoded, {skipped} skipped as existing{" (use -r flag to overwrite them)" if skipped else ""}')
 
 if args.lists > 0:
     print('Save playlists:', end='', flush=True)
