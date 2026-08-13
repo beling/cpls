@@ -24,9 +24,7 @@ args = parser.parse_args()
 real_run = not args.dry
 
 # --- Load Profile Logic ---
-supported_set = set()
-mapping_dict = {}
-    
+   
 # Locate the profile file in 'profiles/' directory relative to the script
 profiles_path = Path(__file__).resolve().parent / 'profiles'
 profile_file = profiles_path / args.profile if args.profile else None
