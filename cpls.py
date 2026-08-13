@@ -169,7 +169,7 @@ for idx, (dst_file, (src_file, metadata)) in enumerate(reversed(dst_to_src.items
             "-i", str(src_file), "-codec:a", "libmp3lame", "-qscale:a", "2",
             "-map_metadata", "0:s:a:0" if src_file.suffix.lower() in ('.opus', '.ogg') else "0",
             "-id3v2_version", "3", "-write_id3v1", "1",
-            str(dst_file)])
+            str(dst_file)], check=True)
         converted += 1
 
 print(f'{len(dst_to_src)-converted-skipped} copied, {converted} transcoded, {skipped} skipped as existing{" (use -r flag to overwrite them)" if skipped else ""}')
