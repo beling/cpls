@@ -167,7 +167,7 @@ for idx, (dst_file, (src_file, metadata)) in enumerate(reversed(dst_to_src.items
         if real_run: copyfile(src_file, dst_file)
     else:   # convert to mp3:
         if real_run: subprocess.run(["ffmpeg",
-            "-hide_banner", "-loglevel", "error",
+            "-hide_banner", "-y", "-loglevel", "error",
             "-i", str(src_file), "-codec:a", "libmp3lame", "-qscale:a", "2",
             "-map_metadata", "0:s:a:0", "-id3v2_version", "3", "-write_id3v1", "1",
             str(dst_file)])
