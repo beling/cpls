@@ -100,8 +100,6 @@ with open(playlist_filename) as f:
 
 to_del = set() if args.nodel else set(f.name for f in dst_dir.iterdir() if f.is_file())
 dst_to_src = {}
-skipped = 0
-converted = 0
 while dsts:
     dst_file_candidate, src_files = dsts.popitem()
     number = 1
