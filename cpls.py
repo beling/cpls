@@ -89,8 +89,7 @@ metadata = None
 dsts = defaultdict(list)    # maps destination file name to source file name(s)
 with open(playlist_filename) as f:
     for src_file in f:
-        src_file = src_file.rstrip()
-        if not src_file: continue
+        if not src_file or src_file.isspace(): continue
         if src_file.startswith("#"):
             if src_file.startswith("#EXTINF:"): metadata = src_file
             continue
