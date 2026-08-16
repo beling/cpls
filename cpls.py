@@ -142,6 +142,7 @@ if to_del:
 total_files = len(dst_to_src)
 skipped = 0
 converted = 0
+if total_files: print(f"Copying {total_files} files:")
 for idx, (dst_file, (src_file, metadata)) in enumerate(reversed(dst_to_src.items()), start=1):
     print(f"[{idx}/{total_files}] {src_file.name}",
         f" -> {dst_file.name}" if src_file.name != dst_file.name else '', sep='', end='')
@@ -152,7 +153,7 @@ for idx, (dst_file, (src_file, metadata)) in enumerate(reversed(dst_to_src.items
         try: dst_stat = dst_file.stat()
         except FileNotFoundError: return True   # destination does not exist
         src_stat = src_file.stat()
-        if src_stat.st_mtime_ns > dst_stat.st_mtime_ns: return True # modification after last coping
+        if src_stat.st_mtime_ns > dst_stat.st_mtime_ns: return True # modification after last copying
         return to_copy and src_stat.st_size != dst_stat.st_size # file to copy differs in size
 
     if not args.replace and not should_copy():
